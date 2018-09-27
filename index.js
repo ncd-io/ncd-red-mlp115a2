@@ -29,11 +29,11 @@ module.exports = class MLP115A2{
 
 			this.initialized = true;
 		}).catch((err) => {
+			this.initialized = false;
 			console.log(err);
 		});
 	}
 	parseStatus(status){
-		console.log(status);
 		//parse the retrieved values into real world values
 
 		var press = ((status[0] << 8) | status[1]) >> 6;
