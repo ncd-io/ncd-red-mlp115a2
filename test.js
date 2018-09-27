@@ -4,8 +4,8 @@ var MLP115A2 = require('./index.js');
 /*
  * Allows use of a USB to I2C converter form ncd.io
  */
-var port = '/dev/tty.usbserial-DN03Q7F9';
-var serial = new comms.NcdSerial('/dev/tty.usbserial-DN03Q7F9', 115200);
+var port = '/dev/tty.usbserial-DN04EUP8';
+var serial = new comms.NcdSerial(port, 115200);
 var comm = new comms.NcdSerialI2C(serial, 0);
 
 /*
@@ -14,17 +14,21 @@ var comm = new comms.NcdSerialI2C(serial, 0);
 //var comm = new comms.NcdI2C(1);
 
 var config = {
-	range: 15,
-	sType: "d",
-	tempScale: "f"
+	tempScale: "f",
+	pScale: 1
 };
-var dac = new MLP115A2(0x78, comm, config);
+var dac = new MLP115A2(comm, config);
 
 function testGet(){
-	dac.get().then((r) => {
-		console.log(r);
+	if(dac.initialized){
+		dac.get().then((r) => {
+			console.log(r);
+			setTimeout(testGet, 1000);
+		}).catch(console.log);
+	}else{
+		dac.init();
 		setTimeout(testGet, 1000);
-	}).catch(console.log);
+	}
 }
 
 testGet();
