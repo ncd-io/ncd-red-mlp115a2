@@ -1,14 +1,15 @@
 ###This text and image should be replaced:
-This library provides a class for the AMS5812 series, it relies on the ncd-red-comm library for communication, and includes a node-red node for AMS5812. AMS5812 pressure sensors are a series of high-precision OEM sensors with a digital I²C-interface. [Ncd.io](https://ncd.io) manufactures several mini-modules that utilize these sensors for different applications. You can see a [list here](https://store.ncd.io/?post_type=product&s=ams5812&site_select=https%3A%2F%2Fstore.ncd.io%3Fpost_type%3Dproduct).
+This library provides a class for the MLP115A2 series, it relies on the `ncd-red-comm` library for communication, and includes a node-red node for MLP115A2. The MPL115A2 pressure sensor’s small form factor, low power capability, precision, and
+digital output optimize it for barometric measurement applications. [Ncd.io](https://ncd.io) manufactures a [training board](https://store.ncd.io/product/iot-training-controller-light-sound-sensor-action/) that utilizes this chip, along with several others, and is ideal for education applications.
 
-[![AMS5812](./AMS5812.png)](https://store.ncd.io/?post_type=product&s=ams5812&site_select=https%3A%2F%2Fstore.ncd.io%3Fpost_type%3Dproduct)
+[![PR51-18](./PR51-18.png)](https://store.ncd.io/product/iot-training-controller-light-sound-sensor-action/)
 
 ### Installation
 
 This library can be installed with npm with the following command:
 
 ```
-npm install ncd-red-{{chip}}
+npm install ncd-red-mpl115a2
 ```
 
 For use in node-red, use the same command, but inside of your node-red directory (usually `~./node-red`).

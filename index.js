@@ -1,57 +1,56 @@
 module.exports = class MLP115A2{
-	constructor(addr, comm, config){
+	constructor(comm, config){
 		//ensure config is an object
 		if(typeof config != 'object') config = {};
 
 		//extend with default values
 		this.config = Object.assign({
-			range: 0,
-			sType: "d",
 			tempScale: "c",
-			pScale: "mbar"
+			pScale: 1
 		}, config);
 
 		//set default states and initialize
 		this.comm = comm;
-		this.addr = addr;
+		this.addr = 0x60;
 		this.initialized = false;
 		this.status = {};
-		this.raw = [];
+		this.coef = [];
 		this.init();
 	}
 	init(){
 		//Run initialization routine for the chip
-		this.get().then().catch((err) => {
+		this.comm.readBytes(this.addr, 0x04, 8).then((b) => {
+			console.log(b);
+			this.coef = [];
+
+			this.coef.push(
+				signInt(
+					(
+						(b[0] << 8) | b[1]
+					), 16) / 8);
+			this.coef.push(signInt(((b[2] << 8) | b[3]), 16) / 8192);
+			this.coef.push(signInt(((b[4] << 8) | b[5]), 16) / 16384);
+			this.coef.push(signInt(((b[6] << 8) | b[7]) >> 2, 16) / 4194304);
+
+
+			console.log(this.coef);
+			this.initialized = true;
+		}).catch((err) => {
 			console.log(err);
 		});
 	}
 	parseStatus(status){
+		console.log(status);
 		//parse the retrieved values into real world values
-		var range = this.config.range;
-		var min = 0,
-			max;
 
-		switch(this.config.range){
-			case 0:
-				max = .075;
-				break;
-			case 1:
-				max = .15;
-				break;
-			default:
-				max = this.config.range/10;
-				break;
-		}
+		var press = ((status[0] << 8) | status[1]) >> 6;
+		var temp = ((status[2] << 8) | status[3]) >> 6;
 
-		if(this.config.sType.toLowerCase() == "d-b") min -= max;
-		else if(this.config.sType.toLowerCase() == "b") min = 11;
-
-		var pCounts = ((status[0] & 127) << 8) | status[1];
-		var tCounts = ((status[2] & 127) << 8) | status[3];
+		var pComp = this.coef[0] + (this.coef[1] + this.coef[3] * temp) * press + this.coef[2] * temp;
 		//mbar
-		this.status.pressure = ((pCounts - 3277) / (26214 / (max-min)) + min) * this.config.pScale;
+		this.status.pressure = (((65 / 1023) * pComp) + 50) * this.config.pScale;
 		//celsius
-		this.status.temperature = ((tCounts - 3277) / (26214 / 110) + (-25));
+		this.status.temperature = ( temp - 498) / -5.35 + 25;
 
 		if(this.config.tempScale.toLowerCase() == "f") this.status.temperature = this.status.temperature * 1.8 + 32;
 		else if(this.config.tempScale.toLowerCase() == "k") this.status.temperature += 273.15;
@@ -61,9 +60,16 @@ module.exports = class MLP115A2{
 	get(){
 		//Fetch the telemetry values from the chip
 		return new Promise((fulfill, reject) => {
-			this.comm.readBytes(this.addr, 4).then((r) => {
-				this.initialized = true;
-				fulfill(this.parseStatus(r));
+			this.comm.writeByte(this.addr, 0x12).then(() => {
+				setTimeout(() => {
+					this.comm.readBytes(this.addr, 0x00, 4).then((r) => {
+						this.initialized = true;
+						fulfill(this.parseStatus(r));
+					}).catch((err) => {
+						this.initialized = false;
+						reject(err);
+					});
+				}, 10);
 			}).catch((err) => {
 				this.initialized = false;
 				reject(err);
@@ -71,3 +77,7 @@ module.exports = class MLP115A2{
 		});
 	}
 };
+function signInt(i, b){
+	if(i.toString(2).length != b) return i;
+	return -(((~i) & ((1 << (b-1))-1))+1);
+}

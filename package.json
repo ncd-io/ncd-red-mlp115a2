@@ -1,5 +1,5 @@
 {
-    "name": "ncd-red-lower_chip",
+    "name": "ncd-red-mlp115a2",
     "version": "1.0.0",
     "description": "",
     "main": "index.js",
@@ -8,19 +8,20 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/ncd-io/ncd-red-lower_chip"
+        "url": "https://github.com/ncd-io/ncd-red-mlp115a2"
     },
     "keywords": [
         "MLP115A2",
         "ncd",
         "pressure-sensor",
-        "i2c"
+        "i2c",
+		"iot-training-controller"
     ],
     "author": "Trey Felton",
     "license": "MIT",
     "node-red": {
         "nodes": {
-            "ncd-lower_chip": "lower_chip.js"
+            "ncd-lower_chip": "MLP115A2.js"
         }
     },
     "dependencies": {

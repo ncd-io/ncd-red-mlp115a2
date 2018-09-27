@@ -10,9 +10,6 @@ module.exports = function(RED){
 	function NcdI2cDeviceNode(config){
 		RED.nodes.createNode(this, config);
 
-		//set the address from config
-		this.addr = parseInt(config.addr);
-
 		//set the interval to poll from config
 		this.interval = parseInt(config.interval);
 
@@ -24,7 +21,7 @@ module.exports = function(RED){
 		}
 
 		//create new sensor reference
-		this.sensor = new MLP115A2(this.addr, RED.nodes.getNode(config.connection).i2c, config);
+		this.sensor = new MLP115A2(RED.nodes.getNode(config.connection).i2c, config);
 
 		var node = this;
 
@@ -55,7 +52,7 @@ module.exports = function(RED){
 		}
 
 		//get the current telemetry data
-		(get_status=function(repeat, force){
+		function get_status(repeat, force){
 			if(repeat) clearTimeout(sensor_pool[node.id].timeout);
 			if(device_status(node)){
 				node.sensor.get().then(send_payload).catch((err) => {
@@ -76,7 +73,8 @@ module.exports = function(RED){
 					if(typeof sensor_pool[node.id] != 'undefined') get_status(true);
 				}, 3000);
 			}
-		})(node.interval && !sensor_pool[node.id].polling);
+		}
+		get_status(node.interval && !sensor_pool[node.id].polling);
 
 		//if status is requested, fetch it
 		node.on('input', (msg) => {
@@ -96,5 +94,5 @@ module.exports = function(RED){
 	}
 
 	//register the node with Node-RED
-	RED.nodes.registerType("ncd-lower_chip", NcdI2cDeviceNode);
+	RED.nodes.registerType("ncd-mlp115a2", NcdI2cDeviceNode);
 };
