@@ -1,6 +1,6 @@
 {
     "name": "ncd-red-mlp115a2",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "",
     "main": "index.js",
     "scripts": {
@@ -21,11 +21,15 @@
     "license": "MIT",
     "node-red": {
         "nodes": {
-            "ncd-lower_chip": "MLP115A2.js"
+            "ncd-mlp115a2": "MLP115A2.js"
         }
     },
     "dependencies": {
         "ncd-red-comm": "^1.5.1",
         "promise-queue": "^2.2.5"
-    }
+    },
+	"bugs": {
+	    "url": "https://github.com/ncd-io/ncd-red-mlp115a2/issues"
+	  },
+	  "homepage": "https://github.com/ncd-io/ncd-red-mlp115a2#readme"
 }
