@@ -20,20 +20,13 @@ module.exports = class MLP115A2{
 	init(){
 		//Run initialization routine for the chip
 		this.comm.readBytes(this.addr, 0x04, 8).then((b) => {
-			console.log(b);
 			this.coef = [];
 
-			this.coef.push(
-				signInt(
-					(
-						(b[0] << 8) | b[1]
-					), 16) / 8);
+			this.coef.push(signInt(((b[0] << 8) | b[1]), 16) / 8);
 			this.coef.push(signInt(((b[2] << 8) | b[3]), 16) / 8192);
 			this.coef.push(signInt(((b[4] << 8) | b[5]), 16) / 16384);
 			this.coef.push(signInt(((b[6] << 8) | b[7]) >> 2, 16) / 4194304);
 
-
-			console.log(this.coef);
 			this.initialized = true;
 		}).catch((err) => {
 			console.log(err);
